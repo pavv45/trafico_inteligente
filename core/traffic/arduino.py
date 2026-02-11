@@ -13,11 +13,12 @@ serial_lock = threading.Lock()
 
 # ===== MAPEO FÍSICO (Software -> Hardware) =====
 # Zona detección → Semáforo físico que controla esa zona
+# Pines Usuario: A=32,33,34 (Command D) | D=22,23,24 (Command A)
 LOGICAL_TO_PHYSICAL = {
-    0: 'A',  # Zona A → Semáforo A (intersección izq)
+    0: 'D',  # Zona A → enviamos 'D' (pines 32-34) para encender la Intersección A
     1: 'B',  # Zona B → Semáforo B (IDA, superior izq)
     2: 'E',  # Zona C → Semáforo E (IDA, inferior izq) - mismo grupo IDA
-    3: 'D',  # Zona D → Semáforo D (intersección der)
+    3: 'A',  # Zona D → enviamos 'A' (pines 22-24) para encender la Intersección D
     4: 'C',  # Zona E → Semáforo C (VUELTA, superior der) - mismo grupo VUELTA
     5: 'F'   # Zona F → Semáforo F (VUELTA, inferior der)
 }

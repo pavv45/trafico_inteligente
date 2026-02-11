@@ -42,7 +42,7 @@ body {
 
 .sidebar nav a:hover,
 .sidebar nav a.active {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .logout {
@@ -57,6 +57,7 @@ body {
 .content {
     flex: 1;
     padding: 30px;
+    overflow-y: auto;
 }
 
 .page-title {
@@ -85,7 +86,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
 .kpi-title {
@@ -137,10 +138,9 @@ body {
 
 .chart-card {
     background: white;
-    margin-top: 30px;
     padding: 20px;
     border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
 .chart-card h3 {

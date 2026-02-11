@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Intersecciones{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Mapa de Intersecciones</h1>
+<p class="page-subtitle">Selecciona una intersección para ver la cámara</p>
+
+<div class="map">
+    {% for i in intersections %}
+    <a href="/intersections/{{ i.id }}/" class="intersection {{ i.status }}">
+        <span>{{ i.id }}</span>
+    </a>
+    {% endfor %}
+</div>
+
+{% endblock %}

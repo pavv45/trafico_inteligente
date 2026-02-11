@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - Traffic AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f1f5f9;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .settings-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .setting-description {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .unit {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #059669;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            color: #1d4ed8;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Configuración del Sistema</h1>
+            <p>Ajusta los parámetros de detección y control de semáforos</p>
+        </div>
+
+        {% if saved %}
+        <div class="alert alert-success">
+            ✅ Configuración guardada exitosamente
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- DETECCIÓN -->
+            <div class="settings-section">
+                <div class="section-title">🎯 Parámetros de Detección</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Confianza Mínima YOLO</div>
+                        <div class="setting-description">Umbral de confianza para detectar vehículos (0.0 - 1.0)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="min_confidence" value="0.25" min="0" max="1" step="0.05">
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Tamaño Mínimo de Vehículo</div>
+                        <div class="setting-description">Área mínima en píxeles cuadrados</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="min_vehicle_size" value="100" min="10" max="1000">
+                        <span class="unit">px²</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Frames de Estabilización</div>
+                        <div class="setting-description">Número de frames para promediar detecciones</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="stability_frames" value="10" min="1" max="30">
+                        <span class="unit">frames</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Brillo Mínimo</div>
+                        <div class="setting-description">Brillo mínimo para considerar imagen válida</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="min_brightness" value="25" min="0" max="255">
+                        <span class="unit">/ 255</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIEMPOS -->
+            <div class="settings-section">
+                <div class="section-title">⏱️ Tiempos de Semáforo</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Tiempo Base en Verde</div>
+                        <div class="setting-description">Tiempo mínimo que dura la luz verde</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="base_green_time" value="3" min="1" max="10">
+                        <span class="unit">segundos</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Tiempo por Vehículo</div>
+                        <div class="setting-description">Segundos adicionales por cada vehículo detectado</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="time_per_vehicle" value="5" min="1" max="10">
+                        <span class="unit">segundos</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Tiempo Máximo en Verde</div>
+                        <div class="setting-description">Límite superior para evitar esperas muy largas</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="max_green_time" value="45" min="10" max="120">
+                        <span class="unit">segundos</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Tiempo Amarillo</div>
+                        <div class="setting-description">Duración de la luz amarilla de transición</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="yellow_time" value="3" min="1" max="5">
+                        <span class="unit">segundos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CÁMARA -->
+            <div class="settings-section">
+                <div class="section-title">📷 Configuración de Cámara</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Fuente de Video</div>
+                        <div class="setting-description">Webcam (0) o DroidCam IP</div>
+                    </div>
+                    <div class="setting-control">
+                        <select name="camera_source">
+                            <option value="0">Webcam USB (0)</option>
+                            <option value="http://192.168.100.138:4747/video" selected>DroidCam WiFi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Resolución</div>
+                        <div class="setting-description">Resolución de captura de video</div>
+                    </div>
+                    <div class="setting-control">
+                        <select name="resolution">
+                            <option value="640x480">640 x 480</option>
+                            <option value="1280x720" selected>1280 x 720 (HD)</option>
+                            <option value="1920x1080">1920 x 1080 (Full HD)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">FPS Objetivo</div>
+                        <div class="setting-description">Cuadros por segundo</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" name="target_fps" value="30" min="10" max="60">
+                        <span class="unit">fps</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ARDUINO -->
+            <div class="settings-section">
+                <div class="section-title">🔌 Puerto Serial Arduino</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Puerto COM</div>
+                        <div class="setting-description">Puerto de comunicación con Arduino</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" name="serial_port" value="COM3" placeholder="COM3">
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-label">Baud Rate</div>
+                        <div class="setting-description">Velocidad de comunicación serial</div>
+                    </div>
+                    <div class="setting-control">
+                        <select name="baud_rate">
+                            <option value="9600" selected>9600</option>
+                            <option value="115200">115200</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">💾 Guardar Configuración</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.reload()">🔄
+                    Restablecer</button>
+            </div>
+        </form>
+
+        <br>
+        <a href="/" class="back-link">← Volver al Dashboard</a>
+    </div>
+</body>
+
+</html>

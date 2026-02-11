@@ -1,0 +1,12 @@
+# Entornos virtuales
+venv/
+core/venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos grandes binarios
+*.dll
+*.pyd

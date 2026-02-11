@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sistema de Tráfico{% endblock %}</title>
+
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            🚦 <span>Sistema de Tráfico</span>
+        </div>
+
+        <nav>
+            <a href="/" class="active">📊 Dashboard</a>
+            <a href="/intersections/">🚦 Intersecciones</a>
+            <a href="/reports/">📈 Reportes</a>
+            <a href="/settings/">⚙️ Configuración</a>
+            <a href="/users/">👥 Usuarios</a>
+        </nav>
+
+        <a class="logout" href="/accounts/logout/">⏻ Cerrar sesión</a>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">Monitoreo de Tráfico en Tiempo Real</h1>
+<p class="page-subtitle">Vista general del sistema de gestión de tráfico inteligente</p>
+
+<!-- TARJETAS KPI -->
+<div class="kpi-grid">
+
+    <div class="kpi-card">
+        <div>
+            <p class="kpi-title">Vehículos Detectados Hoy</p>
+            <h2 class="kpi-value">{{ total_vehicles_today|default:"0" }}</h2>
+        </div>
+        <div class="kpi-icon blue">🚗</div>
+    </div>
+
+    <div class="kpi-card">
+        <div>
+            <p class="kpi-title">Ciclos Ejecutados Hoy</p>
+            <h2 class="kpi-value">{{ cycles_count_today|default:"0" }}</h2>
+        </div>
+        <div class="kpi-icon green">🔄</div>
+    </div>
+
+    <div class="kpi-card">
+        <div>
+            <p class="kpi-title">Tiempo Promedio Verde</p>
+            <h2 class="kpi-value">{{ avg_green_time|default:"0" }} s</h2>
+        </div>
+        <div class="kpi-icon orange">⏱</div>
+    </div>
+
+    <div class="kpi-card">
+        <div>
+            <p class="kpi-title">Total Ciclos Histórico</p>
+            <h2 class="kpi-value">{{ total_cycles_all_time|default:"0" }}</h2>
+        </div>
+        <div class="kpi-icon purple">📊</div>
+    </div>
+
+    <!-- GRÁFICO -->
+    <div class="chart-card">
+        <h3>Flujo Vehicular (Últimas 24 Horas)</h3>
+        <canvas id="trafficChart"></canvas>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{ hourly_data|json_script:"hourly-data" }}
+
+<script>
+    // Datos reales del servidor (pasados de forma segura)
+    const hourlyData = JSON.parse(document.getElementById('hourly-data').textContent);
+
+    // Generar labels de horas
+    const now = new Date();
+    const labels = [];
+    for (let i = 23; i >= 0; i--) {
+        const hour = new Date(now - i * 60 * 60 * 1000);
+        labels.push(hour.getHours() + ':00');
+    }
+
+    // Crear gráfico
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Vehículos Detectados',
+                data: hourlyData,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Auto-actualizar cada 30 segundos
+    setInterval(() => {
+        window.location.reload();
+    }, 30000);
+</script>
+{% endblock %}

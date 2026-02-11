@@ -1,0 +1,517 @@
+{% extends "base.html" %}
+
+{% block title %}Control de Tráfico{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .main-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        padding: 20px;
+        min-height: 100vh;
+        background: #f1f5f9;
+    }
+
+    /* VIDEO */
+    .video-section {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .video-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .video-title {
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        background: #10b981;
+        padding: 6px 12px;
+        border-radius: 6px;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .video-frame {
+        width: 100%;
+        border-radius: 8px;
+        background: #000;
+        min-height: 500px;
+    }
+
+    /* MAQUETA */
+    .control-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+    /* INTERSECCIÓN EN CRUZ */
+    .intersection-map {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1;
+        max-width: 400px;
+        margin: 0 auto 30px;
+        background: #cbd5e1;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    /* Calles */
+    .road-vertical {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 35%;
+        height: 100%;
+        background: #475569;
+        border-left: 3px dashed #94a3b8;
+        border-right: 3px dashed #94a3b8;
+    }
+
+    .road-horizontal {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        width: 100%;
+        height: 35%;
+        background: #475569;
+        border-top: 3px dashed #94a3b8;
+        border-bottom: 3px dashed #94a3b8;
+    }
+
+    /* Centro del cruce */
+    .intersection-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 35%;
+        height: 35%;
+        background: #334155;
+        border: 2px solid #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    /* SEMÁFOROS */
+    .traffic-light {
+        position: absolute;
+        background: #1e293b;
+        border-radius: 10px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+    }
+
+    .light {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #1e293b;
+        border: 2px solid #334155;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+        transition: all 0.3s ease;
+    }
+
+    .light.active {
+        border-color: currentColor;
+        box-shadow: 0 0 15px currentColor, inset 0 0 5px currentColor;
+    }
+
+    .light.red.active {
+        background: #ef4444;
+        color: #ef4444;
+    }
+
+    .light.yellow.active {
+        background: #fbbf24;
+        color: #fbbf24;
+    }
+
+    .light.green.active {
+        background: #10b981;
+        color: #10b981;
+    }
+
+    .light-label {
+        text-align: center;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 0;
+    }
+
+    /* Posiciones de los semáforos según la maqueta */
+    /* Semáforo A - Izquierda arriba */
+    #traffic-a {
+        top: 15%;
+        left: 5%;
+    }
+
+    /* Semáforo B - Centro arriba izq */
+    #traffic-b {
+        top: 8%;
+        left: 38%;
+    }
+
+    /* Semáforo C - Centro abajo izq */
+    #traffic-c {
+        bottom: 8%;
+        left: 38%;
+    }
+
+    /* Semáforo D - Derecha abajo */
+    #traffic-d {
+        bottom: 15%;
+        right: 5%;
+    }
+
+    /* Semáforo E - Centro arriba der */
+    #traffic-e {
+        top: 8%;
+        right: 38%;
+    }
+
+    /* Semáforo F - Centro abajo der */
+    #traffic-f {
+        bottom: 8%;
+        right: 38%;
+    }
+
+    /* ESTADÍSTICAS */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: #f8fafc;
+        padding: 16px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    /* CONTEOS */
+    .counts-section {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+    .counts-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 12px;
+    }
+
+    .count-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .count-row:last-child {
+        border-bottom: none;
+    }
+
+    .count-label {
+        font-size: 13px;
+        color: #475569;
+    }
+
+    .count-value {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 15px;
+        min-width: 30px;
+        text-align: right;
+    }
+
+    @media (max-width: 968px) {
+        .main-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="main-container">
+    <!-- VIDEO -->
+    <div class="video-section">
+        <div class="video-header">
+            <span class="video-title">📷 Cámara Activa</span>
+            <span class="status-badge">🟢 En Vivo</span>
+        </div>
+        <img src="{% url 'video_feed' %}" class="video-frame" alt="Video en vivo" />
+    </div>
+
+    <!-- CONTROL -->
+    <div class="control-section">
+        <div class="section-title">🚦 Control del Semáforo</div>
+
+        <!-- BOTONES DE CONTROL MANUAL -->
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+            <button onclick="controlSystem('start')"
+                style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                ▶ INICIAR SISTEMA
+            </button>
+            <button onclick="controlSystem('stop')"
+                style="padding: 10px 20px; background: #f59e0b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                ⏸ PAUSAR
+            </button>
+            <button onclick="controlSystem('emergency')"
+                style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                🚨 EMERGENCIA
+            </button>
+        </div>
+
+        <div id="system-status" style="text-align: center; margin-bottom: 15px; font-weight: bold; color: #64748b;">
+            Estado: Esperando comando...
+        </div>
+
+        <script>
+            async function controlSystem(action) {
+                const statusDiv = document.getElementById('system-status');
+                statusDiv.innerText = "Procesando...";
+
+                let url = '';
+                if (action === 'start') url = '/auto/start/';
+                if (action === 'stop') url = '/auto/stop/';
+                if (action === 'emergency') url = '/emergency/';
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        statusDiv.innerText = "✅ " + data.message;
+                        statusDiv.style.color = "#10b981";
+                    } else {
+                        statusDiv.innerText = "❌ Error: " + data.message;
+                        statusDiv.style.color = "#ef4444";
+                    }
+                } catch (e) {
+                    statusDiv.innerText = "❌ Error de conexión";
+                    console.error(e);
+                }
+            }
+        </script>
+
+        <!-- MAQUETA DIGITAL -->
+        <div class="intersection-map">
+            <!-- Calles -->
+            <div class="road-vertical"></div>
+            <div class="road-horizontal"></div>
+
+            <!-- Centro -->
+            <div class="intersection-center">CRUCE</div>
+
+            <!-- Semáforo A -->
+            <div class="traffic-light" id="traffic-a">
+                <div class="light red" id="light-a-red"></div>
+                <div class="light yellow" id="light-a-yellow"></div>
+                <div class="light green" id="light-a-green"></div>
+                <div class="light-label">A</div>
+            </div>
+
+            <!-- Semáforo B -->
+            <div class="traffic-light" id="traffic-b">
+                <div class="light red" id="light-b-red"></div>
+                <div class="light yellow" id="light-b-yellow"></div>
+                <div class="light green" id="light-b-green"></div>
+                <div class="light-label">B</div>
+            </div>
+
+            <!-- Semáforo C -->
+            <div class="traffic-light" id="traffic-c">
+                <div class="light red" id="light-c-red"></div>
+                <div class="light yellow" id="light-c-yellow"></div>
+                <div class="light green" id="light-c-green"></div>
+                <div class="light-label">C</div>
+            </div>
+
+            <!-- Semáforo D -->
+            <div class="traffic-light" id="traffic-d">
+                <div class="light red" id="light-d-red"></div>
+                <div class="light yellow" id="light-d-yellow"></div>
+                <div class="light green" id="light-d-green"></div>
+                <div class="light-label">D</div>
+            </div>
+
+            <!-- Semáforo E -->
+            <div class="traffic-light" id="traffic-e">
+                <div class="light red" id="light-e-red"></div>
+                <div class="light yellow" id="light-e-yellow"></div>
+                <div class="light green" id="light-e-green"></div>
+                <div class="light-label">E</div>
+            </div>
+
+            <!-- Semáforo F -->
+            <div class="traffic-light" id="traffic-f">
+                <div class="light red" id="light-f-red"></div>
+                <div class="light yellow" id="light-f-yellow"></div>
+                <div class="light green" id="light-f-green"></div>
+                <div class="light-label">F</div>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total</div>
+                <div class="stat-value" id="total-vehicles">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">En Verde</div>
+                <div class="stat-value" id="green-lanes" style="font-size: 16px;">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Brillo</div>
+                <div class="stat-value" id="brightness" style="font-size: 18px;">-</div>
+            </div>
+        </div>
+
+        <!-- CONTEOS POR ZONA -->
+        <div class="counts-section">
+            <div class="counts-title">Vehículos por Zona</div>
+            <div class="count-row">
+                <span class="count-label">Zona A</span>
+                <span class="count-value" id="count-a">0</span>
+            </div>
+            <div class="count-row">
+                <span class="count-label">Zona B</span>
+                <span class="count-value" id="count-b">0</span>
+            </div>
+            <div class="count-row">
+                <span class="count-label">Zona C</span>
+                <span class="count-value" id="count-c">0</span>
+            </div>
+            <div class="count-row">
+                <span class="count-label">Zona D</span>
+                <span class="count-value" id="count-d">0</span>
+            </div>
+            <div class="count-row">
+                <span class="count-label">Zona E</span>
+                <span class="count-value" id="count-e">0</span>
+            </div>
+            <div class="count-row">
+                <span class="count-label">Zona F</span>
+                <span class="count-value" id="count-f">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sincronización en tiempo real con maqueta física
+    async function updateTrafficLights() {
+        try {
+            const response = await fetch('/traffic_status/');
+            const data = await response.json();
+
+            // Actualizar cada semáforo
+            const lanes = ['a', 'b', 'c', 'd', 'e', 'f'];
+            const states = data.lights || ['R', 'R', 'R', 'R', 'R', 'R'];
+
+            lanes.forEach((lane, index) => {
+                const state = states[index];
+
+                // Desactivar todas
+                document.getElementById(`light-${lane}-red`).classList.remove('active');
+                document.getElementById(`light-${lane}-yellow`).classList.remove('active');
+                document.getElementById(`light-${lane}-green`).classList.remove('active');
+
+                // Activar la correcta
+                if (state === 'R') {
+                    document.getElementById(`light-${lane}-red`).classList.add('active');
+                } else if (state === 'Y') {
+                    document.getElementById(`light-${lane}-yellow`).classList.add('active');
+                } else if (state === 'G') {
+                    document.getElementById(`light-${lane}-green`).classList.add('active');
+                }
+            });
+
+            // Actualizar conteos
+            if (data.counts && data.counts.length === 6) {
+                document.getElementById('count-a').innerText = data.counts[0];
+                document.getElementById('count-b').innerText = data.counts[1];
+                document.getElementById('count-c').innerText = data.counts[2];
+                document.getElementById('count-d').innerText = data.counts[3];
+                document.getElementById('count-e').innerText = data.counts[4];
+                document.getElementById('count-f').innerText = data.counts[5];
+
+                const total = data.counts.reduce((a, b) => a + b, 0);
+                document.getElementById('total-vehicles').innerText = total;
+            }
+
+            // Carriles en verde
+            const greenLanes = [];
+            states.forEach((state, i) => {
+                if (state === 'G') greenLanes.push(['A', 'B', 'C', 'D', 'E', 'F'][i]);
+            });
+            document.getElementById('green-lanes').innerText = greenLanes.length > 0 ? greenLanes.join(',') : '-';
+
+        } catch (e) {
+            console.error('Error:', e);
+        }
+    }
+
+    // Actualizar cada 500ms
+    setInterval(updateTrafficLights, 500);
+    updateTrafficLights();
+</script>
+
+{% endblock %}

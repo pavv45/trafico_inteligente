@@ -1,0 +1,184 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f5f7fb;
+}
+
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: #1e40af;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+.sidebar nav a {
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    display: block;
+    transition: background 0.2s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+    background: rgba(255,255,255,0.2);
+}
+
+.logout {
+    margin-top: auto;
+    color: #ffdddd;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* CONTENIDO */
+.content {
+    flex: 1;
+    padding: 30px;
+}
+
+.page-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.page-subtitle {
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+/* KPI GRID */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+/* KPI CARD */
+.kpi-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.kpi-title {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.kpi-extra {
+    font-size: 12px;
+    color: #16a34a;
+}
+
+/* ICONOS */
+.kpi-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.kpi-icon.blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.kpi-icon.green {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.kpi-icon.orange {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.kpi-icon.purple {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.chart-card {
+    background: white;
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.chart-card h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* MAPA DE INTERSECCIONES */
+.map {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 120px);
+    gap: 40px;
+}
+
+.intersection {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: white;
+    text-decoration: none;
+    margin: 20px;
+    transition: background-color 0.5s;
+}
+
+.intersection.green {
+    background-color: #16a34a;
+}
+
+.intersection.yellow {
+    background-color: #d97706;
+}
+
+.intersection.red {
+    background-color: #dc2626;
+}
